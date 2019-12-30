@@ -48,7 +48,6 @@ const io = require("socket.io")(server);
 io.on("connection", client => {
   console.log("Socket conectado " + client.id);
   let user = null;
-  //console.log(client)
 
   client.on("userLogged", data => {
     client.broadcast.emit("user", data);

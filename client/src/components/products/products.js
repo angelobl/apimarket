@@ -14,8 +14,6 @@ import { getProducts, api, getSales, validateImage } from "../../api";
 import { UserContext } from "../../context/user-context";
 import { SalesContext } from "../../context/sales-context";
 
-import axios from "axios";
-import { BASE_URL } from "../../urls";
 
 const Products = props => {
   const [products, setProducts] = useState([]);
@@ -41,7 +39,6 @@ const Products = props => {
       if (token) {
         setIsLoading(true)
         const productslist = await getProducts(token);
-        
         setProducts(productslist);
         setIsLoading(false)
       }
@@ -96,55 +93,47 @@ const Products = props => {
     const token = localStorage.getItem("token");
 
     //Get signed url and url for image
-    const resImage = await axios({
-      method: "post", //you can set what request you want to be
-      url: `${BASE_URL}/products/generateUrl`,
-      data: {
+    const resImage = await api(
+      "/products/generateUrl",
+      {
         Bucket: "apimarket",
         Key: `${user}/products/${fileImage.name}`,
         type: fileImage.type
       },
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: token
-      }
-    });
+      "POST",
+      token
+    );
+    const imageJson = await resImage.json();
 
     //Get signed url and url for video
-    const resVideo = await axios({
-      method: "post", //you can set what request you want to be
-      url: `${BASE_URL}/products/generateUrl`,
-      data: {
+    const resVideo = await api(
+      "/products/generateUrl",
+      {
         Bucket: "apimarket",
         Key: `${user}/products/${fileVideo.name}`,
         type: fileVideo.type
       },
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: token
-      }
-    });
+      "POST",
+      token
+    );
+    const videoJson = await resVideo.json();
 
     //Upload image to s3
-    const resAwsImage = await axios({
-      method: "put", //you can set what request you want to be
-      url: resImage.data.signedUrl,
-      data: fileImage,
+    const resAwsImage = await fetch(imageJson.signedUrl, {
       headers: {
         "Content-Type": fileImage.type
-      }
+      },
+      method: "PUT",
+      body: fileImage
     });
 
     //Upload video to s3
-    const resAwsVideo = await axios({
-      method: "put", //you can set what request you want to be
-      url: resVideo.data.signedUrl,
-      data: fileVideo,
+    const resAwsVideo = await fetch(videoJson.signedUrl, {
       headers: {
         "Content-Type": fileVideo.type
-      }
+      },
+      method: "PUT",
+      body: fileVideo
     });
 
     if (resAwsImage.status !== 200 || resAwsVideo.status !== 200) {
@@ -152,22 +141,19 @@ const Products = props => {
     }
 
     //Save product in database
-    const res = await axios({
-      method: "post", //you can set what request you want to be
-      url: `${BASE_URL}/products`,
-      data: {
+    const res = await api(
+      "/products",
+      {
         name: productName,
         price: productPrice,
         stock: productStock,
-        image: resImage.data.url,
-        video: resVideo.data.url
+        image: imageJson.url,
+        video: videoJson.url
       },
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: token
-      }
-    });
+      "POST",
+      token
+    );
+    const json = await res.json();
 
     const productList = await getProducts(token);
 
@@ -178,8 +164,9 @@ const Products = props => {
     setFileImage(null);
     setFileVideo(null);
 
-    alert(res.data.message);
+    alert(json.message);
     props.history.push(path);
+    
   });
 
   const handleUpdateRedirect = useCallback(e => {
@@ -224,75 +211,67 @@ const Products = props => {
 
     if (fileImage) {
       //Get signed url and url for image
-      const resImage = await axios({
-        method: "post", //you can set what request you want to be
-        url: `${BASE_URL}/products/generateUrl`,
-        data: {
-          Bucket: "apimarket",
-          Key: `${user}/products/${fileImage.name}`,
-          type: fileImage.type
-        },
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: token
-        }
-      });
+    const resImage = await api(
+      "/products/generateUrl",
+      {
+        Bucket: "apimarket",
+        Key: `${user}/products/${fileImage.name}`,
+        type: fileImage.type
+      },
+      "POST",
+      token
+    );
+    const imageJson = await resImage.json();
+
       //Upload image to s3
-      const resAwsImage = await axios({
-        method: "put", //you can set what request you want to be
-        url: resImage.data.signedUrl,
-        data: fileImage,
-        headers: {
-          "Content-Type": fileImage.type
-        }
-      });
+    const resAwsImage = await fetch(imageJson.signedUrl, {
+      headers: {
+        "Content-Type": fileImage.type
+      },
+      method: "PUT",
+      body: fileImage
+    });
+
+    
       if (resAwsImage.status === 200) {
-        body.image = resImage.data.url;
+        body.image = imageJson.url;
       }
     }
 
     if (fileVideo) {
-      //Get signed url and url for video
-      const resVideo = await axios({
-        method: "post", //you can set what request you want to be
-        url: `${BASE_URL}/products/generateUrl`,
-        data: {
-          Bucket: "apimarket",
-          Key: `${user}/products/${fileVideo.name}`,
-          type: fileVideo.type
-        },
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: token
-        }
-      });
+       //Get signed url and url for video
+    const resVideo = await api(
+      "/products/generateUrl",
+      {
+        Bucket: "apimarket",
+        Key: `${user}/products/${fileVideo.name}`,
+        type: fileVideo.type
+      },
+      "POST",
+      token
+    );
+    const videoJson = await resVideo.json();
       //Upload video to s3
-      const resAwsVideo = await axios({
-        method: "put", //you can set what request you want to be
-        url: resVideo.data.signedUrl,
-        data: fileVideo,
-        headers: {
-          "Content-Type": fileVideo.type
-        }
-      });
+    const resAwsVideo = await fetch(videoJson.signedUrl, {
+      headers: {
+        "Content-Type": fileVideo.type
+      },
+      method: "PUT",
+      body: fileVideo
+    });
       if (resAwsVideo.status === 200) {
-        body.video = resVideo.data.url;
+        body.video = videoJson.url;
       }
     }
 
     //Save product in database
-    const res = await axios({
-      method: "put", //you can set what request you want to be
-      url: `${BASE_URL}/products`,
-      data: body,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: token
-      }
-    });
+    const res = await api(
+      "/products",
+      body,
+      "PUT",
+      token
+    );
+    const json = await res.json();
 
     const productList = await getProducts(token);
 
@@ -304,7 +283,7 @@ const Products = props => {
     setOwner("");
     setImage(null);
     setVideo(null);
-    alert(res.data.message);
+    alert(json.message);
     props.history.push(path);
   });
 

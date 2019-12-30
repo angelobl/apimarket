@@ -107,8 +107,8 @@ const Update = props => {
           <button className="btn waves-effect waves-light">
             Actualizar Producto
           </button>
-          <Dropbox handleDrop={onDropImage} />
-          <Dropbox handleDrop={onDropVideo} />
+          <Dropbox handleDrop={onDropImage} name="image" />
+          <Dropbox handleDrop={onDropVideo} name="video"/>
         </form>
       </div>
       <div className="">

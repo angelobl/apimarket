@@ -6,13 +6,12 @@ import Register from "./register";
 
 import { api } from "../../api";
 
-
-import {UserContext} from "../../context/user-context"
+import { UserContext } from "../../context/user-context";
 
 const Authentication = props => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { setUser } = useContext(UserContext)
+  const { setUser } = useContext(UserContext);
 
   const handleChange = useCallback(e => {
     const { value, name } = e.target;
@@ -55,8 +54,8 @@ const Authentication = props => {
     );
     const json = await res.json();
     if (res.statusText === "OK") {
-      localStorage.setItem("token", res.headers.get("Authorization") ); 
-      setUser(username)
+      localStorage.setItem("token", res.headers.get("Authorization"));
+      setUser(username);
       props.history.push("/");
     } else if (json.message) {
       alert(json.message);
@@ -72,7 +71,6 @@ const Authentication = props => {
 
         <Route path={`/register`}>
           <Register
-            path="register"
             handleChange={handleChange}
             handleRegister={handleRegister}
           />

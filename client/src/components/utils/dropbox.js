@@ -6,7 +6,7 @@ const Dropbox = props => (
     onDrop={props.handleDrop}
     className="dropbox"
   >
-    <p>Drag and Drop your video here</p>
+    <p>Drag and Drop your {props.name} here</p>
   </div>
 );
 

@@ -13,7 +13,6 @@ router.post("/login", async (req, res, next) => {
     if (!user.comparePassword(password)) {
       res.status(500).json({ message: "Wrong password" });
     } else {
-      console.log(user.jwt);
       res.header("Authorization", user.jwt);
       res.status(200).json({ message: "Success" });
     }
@@ -35,9 +34,7 @@ router.post("/register", async (req, res, next) => {
       newUser.username = username;
       encryptedPassword = newUser.encryptPassword(password);
       newUser.password = encryptedPassword;
-      console.log(encryptedPassword);
       newUser.jwt = jwt.sign({ username, password: encryptedPassword }, process.env.JWT_SECRET );
-      console.log(newUser);
       await newUser.save();
       res.status(200).json({ message: "User registered" });
     }

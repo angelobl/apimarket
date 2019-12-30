@@ -1,8 +1,8 @@
 import React, { useCallback, useState, useRef, useEffect } from "react";
 import { predict } from "../../api";
 
-import Spinner from '../utils/spinner'
-import Dropbox from '../utils/dropbox'
+import Spinner from "../utils/spinner";
+import Dropbox from "../utils/dropbox";
 
 const AddProduct = props => {
   const [isLoading, setIsLoading] = useState(false);
@@ -72,7 +72,12 @@ const AddProduct = props => {
   return (
     <div
       className="content"
-      style={{ flexDirection: "row", height: "50%", width: "60%",marginTop:"120px" }}
+      style={{
+        flexDirection: "row",
+        height: "50%",
+        width: "60%",
+        marginTop: "120px"
+      }}
     >
       <div style={{ flexBasis: "60%", paddingRight: "10px" }}>
         <form onSubmit={props.handleSubmit}>
@@ -97,8 +102,8 @@ const AddProduct = props => {
           <button className="btn waves-effect waves-light app-btn">
             Añadir Producto
           </button>
-          <Dropbox handleDrop={onDropImage} />
-          <Dropbox handleDrop={onDropVideo} />
+          <Dropbox handleDrop={onDropImage} name="image" />
+          <Dropbox handleDrop={onDropVideo} name="video"/>
         </form>
       </div>
       <div
